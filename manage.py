@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 import os
+from timeit import default_timer as timer
+
 from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
+
 from app import app, db, models
 from config import config
 from crawler.web_crawler import WebCrawler
@@ -15,7 +18,7 @@ migrate = Migrate(app, db)
 
 def make_shell_context():
     return dict(app=app, db=db, Product=models.Product, SKU=models.SKU,
-                Offer=models.Offer)
+                Offer=models.Offer, Photo=models.Photo)
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
@@ -32,6 +35,7 @@ def test():
 @manager.command
 def dev_crawl():
     """Mini crawl for one process used to populate dev database"""
+    start = timer()
     crawler = WebCrawler("IND.NEW.POSTPAID.MNP")
     offers = crawler.offer_list()
     for offer in offers:
@@ -41,6 +45,8 @@ def dev_crawl():
             for device in devices:
                 crawler.save_or_update_device(device, offer)
     crawler.save_request_counter()
+    end = timer()
+    print("It took %f seconds" % (end-start))
 
 
 if __name__ == "__main__":

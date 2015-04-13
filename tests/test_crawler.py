@@ -75,14 +75,17 @@ class CrawlerTestCase(unittest.TestCase):
 
         device["prices"]["grossPrice"] = "1234,456"
         device["devicePriority"] = 20999
+        device["imagesOnDetails"][0]["defaultImage"] = "false"
+        device["imagesOnDetails"][1]["defaultImage"] = "true"
         offer["monthlyFeeGross"] = "654,321"
         self.crawler.save_or_update_device(device_info=device, offer_info=offer)
         self.assertEqual(Product.query.count(), 1)
         self.assertEqual(Offer.query.count(), 1)
 
-        p = Product.query.first()
         o = Offer.query.first()
-        self.assertEqual(p.priority, 20999)
+
+        self.assertEqual(o.priority, 20999)
         self.assertEqual(o.abo_price, 654.321)
         self.assertEqual(o.price, 1234.456)
         self.assertIsNotNone(o.old_price)
+        self.assertEqual(Photo.query.filter_by(default=True).count(), 1)

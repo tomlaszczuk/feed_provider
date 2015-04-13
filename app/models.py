@@ -6,7 +6,6 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     manufacturer = db.Column(db.String(128), index=True)
     model_name = db.Column(db.String(255), index=True)
-    priority = db.Column(db.Integer)
     product_type = db.Column(db.String(32))
     skus = db.relationship('SKU', backref='base_product', lazy='dynamic')
 
@@ -50,6 +49,7 @@ class Offer(db.Model):
     tariff_plan_code = db.Column(db.String(16), index=True)
     offer_code = db.Column(db.String(16), index=True)
     contract_condition_code = db.Column(db.String(3), index=True)
+    priority = db.Column(db.Integer)
 
     def set_prices(self, scrapped_price):
         if scrapped_price != self.price:

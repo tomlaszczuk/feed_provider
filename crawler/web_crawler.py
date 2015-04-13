@@ -51,13 +51,10 @@ class WebCrawler:
             manufacturer=device_info["brand"],
             model_name=device_info["modelName"]
         ).first()
-        if product is not None:
-            product.priority = device_info["devicePriority"]
-        else:
+        if not product:
             product = Product(
                 manufacturer=device_info["brand"],
                 model_name=device_info["modelName"],
-                priority=device_info["devicePriority"],
                 product_type=device_info["productType"]
             )
 
@@ -100,6 +97,7 @@ class WebCrawler:
         )
         offer.availability = device_info["available"]
         offer.abo_price = float(offer_info["monthlyFeeGross"].replace(",", "."))
+        offer.priority = device_info["devicePriority"]
 
         # =================== Saving ======================= #
         db.session.add(product)
@@ -112,4 +110,4 @@ class WebCrawler:
             now = str(datetime.datetime.now())
             segment = self.segment
             req = self.request_counter
-            request_counter.write("%s; %s; %d" % (now, segment, req))
+            request_counter.write("\n%s; %s; %d" % (now, segment, req))
