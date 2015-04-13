@@ -2,10 +2,20 @@ import unittest
 from config import config
 from crawler.web_crawler import WebCrawler
 
+from app import db, app
+from app.models import Product, Photo, SKU, Offer
+
 
 class CrawlerTestCase(unittest.TestCase):
     def setUp(self):
+        self.app = app
+        self.app.config.from_object(config['testing'])
         self.crawler = WebCrawler(segment="IND.NEW.POSTPAID.ACQ")
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_offers_list_gatherer(self):
         offer_list = self.crawler.offer_list()
@@ -37,6 +47,21 @@ class CrawlerTestCase(unittest.TestCase):
         self.assertIn("brand", device)
         self.assertIn("devicePriority", device)
         self.assertIn("imagesOnDetails", device)
-        self.assertTrue(len(device["images"]) >= 1)
+        self.assertTrue(len(device["imagesOnDetails"]) >= 1)
         self.assertIn("modelName", device)
         self.assertIn("sku", device)
+
+    def test_saving_devices(self):
+        # TODO Write this test
+        offer_list = self.crawler.offer_list()
+        offer = offer_list[0]
+        devices = self.crawler.gather_devices(offer=offer, page=1)
+        device = devices[0]
+        self.crawler.save_or_update_device(device_info=device, offer_info=offer)
+        self.assertEqual(Product.query.count(), 1)
+        self.assertEqual(SKU.query.count(), 1)
+        self.assertEqual(Offer.query.count(), 1)
+        self.assertEqual(
+            Photo.query.count(), len(device['imagesOnDetails'])
+        )
+        self.assertEqual(Photo.query.filter_by(default=True).count(), 1)
