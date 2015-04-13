@@ -43,6 +43,7 @@ class Offer(db.Model):
     sku_id = db.Column(db.Integer, db.ForeignKey('skus.id'))
     price = db.Column(db.Float)
     old_price = db.Column(db.Float)
+    abo_price = db.Column(db.Float)
     availability = db.Column(db.Boolean)
     offer_url = db.Column(db.String(255), unique=True)
     tariff_plan_code = db.Column(db.String(16), index=True)

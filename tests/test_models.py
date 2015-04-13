@@ -33,8 +33,7 @@ class OfferModelTestCase(unittest.TestCase):
                          "deviceStockCode=lg-g2-mini-lte-black&"
                          "processSegmentationCode=IND.NEW.POSTPAID.ACQ&"
                          "marketTypeCode=IND&contractConditionCode=24A&"
-                         "tariffPlanCode=14L70&offerNSICode=XLINS24A"
-                         )
+                         "tariffPlanCode=14L70&offerNSICode=XLINS24A")
 
         offer = Offer(category='Nowy numer TABLET',
                       segmentation='IND.NEW.POSTPAID.ACQ',
@@ -49,8 +48,7 @@ class OfferModelTestCase(unittest.TestCase):
                          "deviceStockCode=lg-g2-mini-lte-black&"
                          "processSegmentationCode=IND.NEW.POSTPAID.ACQ&"
                          "marketTypeCode=IND&contractConditionCode=24A&"
-                         "tariffPlanCode=14L70&offerNSICode=XLINS24A"
-                         )
+                         "tariffPlanCode=14L70&offerNSICode=XLINS24A")
 
     def test_price_updates(self):
         offer = Offer(category='Nowy numer TABLET',
@@ -59,8 +57,7 @@ class OfferModelTestCase(unittest.TestCase):
                       sku=self.phone_variant,
                       offer_code='XLINS24A',
                       tariff_plan_code='14L70',
-                      contract_condition_code='24A',
-                      )
+                      contract_condition_code='24A')
 
         offer.price = 1.23
         offer.set_prices(3.00)
