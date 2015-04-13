@@ -46,7 +46,6 @@ class WebCrawler:
         return devices_json["devices"]
 
     def save_or_update_device(self, device_info, offer_info):
-
         # =================== Product ======================= #
         product = Product.query.filter_by(
             manufacturer=device_info["brand"],

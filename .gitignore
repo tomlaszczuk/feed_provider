@@ -108,3 +108,4 @@ target/
 
 
 .sqlite3
+logs/
