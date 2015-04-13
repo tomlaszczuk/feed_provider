@@ -65,3 +65,24 @@ class CrawlerTestCase(unittest.TestCase):
             Photo.query.count(), len(device['imagesOnDetails'])
         )
         self.assertEqual(Photo.query.filter_by(default=True).count(), 1)
+
+    def test_is_updating_existing_rows(self):
+        offer_list = self.crawler.offer_list()
+        offer = offer_list[0]
+        devices = self.crawler.gather_devices(offer=offer, page=1)
+        device = devices[0]
+        self.crawler.save_or_update_device(device_info=device, offer_info=offer)
+
+        device["prices"]["grossPrice"] = "1234,456"
+        device["devicePriority"] = 20999
+        offer["monthlyFeeGross"] = "654,321"
+        self.crawler.save_or_update_device(device_info=device, offer_info=offer)
+        self.assertEqual(Product.query.count(), 1)
+        self.assertEqual(Offer.query.count(), 1)
+
+        p = Product.query.first()
+        o = Offer.query.first()
+        self.assertEqual(p.priority, 20999)
+        self.assertEqual(o.abo_price, 654.321)
+        self.assertEqual(o.price, 1234.456)
+        self.assertIsNotNone(o.old_price)
