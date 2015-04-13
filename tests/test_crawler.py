@@ -24,3 +24,19 @@ class CrawlerTestCase(unittest.TestCase):
         }
         page_count = self.crawler.pages(offer=offer)
         self.assertIsInstance(page_count, int)
+
+    def test_device_gatherer(self):
+        offer = {
+            "offerNSICode": "NSZAS24A",
+            "tariffPlanCode": "15F2A",
+            "contractConditionCode": "24A"
+        }
+        page = 5
+        devices = self.crawler.gather_devices(offer=offer, page=page)
+        device = devices[0]
+        self.assertIn("brand", device)
+        self.assertIn("devicePriority", device)
+        self.assertIn("imagesOnDetails", device)
+        self.assertTrue(len(device["images"]) >= 1)
+        self.assertIn("modelName", device)
+        self.assertIn("sku", device)
