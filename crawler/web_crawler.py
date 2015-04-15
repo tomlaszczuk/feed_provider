@@ -1,10 +1,11 @@
 import datetime
 import json
 import requests
-from config import Config
+from bs4 import BeautifulSoup as Soup
 
 from app import db
 from app.models import Offer, Photo, Product, SKU
+from config import Config
 
 
 class WebCrawler:
@@ -44,6 +45,33 @@ class WebCrawler:
         self.request_counter += 1
         devices_json = r.json()
         return devices_json["devices"]
+
+    def _all_skus(self, product_url):
+        """
+        Slow. Many requests Use only when necessary
+        Find all skus for given product url
+        """
+        r = requests.get(url=product_url)
+        self.request_counter += 1
+        html = r.content
+        parsed_html = Soup(html)
+        skus = parsed_html.find_all('input', attrs={'name': 'color'})
+        return [sku['device-skus'] for sku in skus]
+
+    def find_all_photos(self, offer):
+        r = requests.get(url=offer.offer_url)
+        self.request_counter += 1
+        html = r.content
+        parsed_html = Soup(html)
+        photo_container = parsed_html.find('div', attrs={'id': 'phone-carousel'})
+        imgs = photo_container.find_all('img')
+        main_photo = Photo(sku=offer.sku, url=imgs[0].attrs['src'],
+                           default=True)
+        db.session.add(main_photo)
+        for img in imgs[1:]:
+            photo = Photo(sku=offer.sku, url=img.attrs['src'], default=False)
+            db.session.add(photo)
+        db.session.commit()
 
     def save_or_update_device(self, device_info, offer_info):
         # =================== Product ======================= #
@@ -103,6 +131,45 @@ class WebCrawler:
         db.session.add(product)
         db.session.add(sku)
         db.session.add(offer)
+        db.session.commit()
+
+    def create_offers_with_new_sku(self, offer_list, sku):
+        for offer in offer_list:
+            r = requests.post(
+                url=Config.DEVICE_PRICES,
+                data={"processSegmentationCode": offer.segmentation,
+                      "deviceStockCode": sku.stock_code,
+                      "offerNSICode": offer.offer_code,
+                      "tariffPlanCode": offer.tariff_plan_code,
+                      "contractConditionCode": offer.contract_condition_code}
+            )
+            self.request_counter += 1
+            if r.json()["devicesPrices"]:
+                new_offer = Offer(
+                    category=offer.category,
+                    segmentation=offer.segmentation,
+                    market=offer.market,
+                    contract_condition_code=offer.contract_condition_code,
+                    sku=sku,
+                    tariff_plan_code=offer.tariff_plan_code,
+                    offer_code=offer.offer_code
+                )
+                db.session.add(new_offer)
+        db.session.commit()
+
+    def save_or_update_skus(self):
+        for product in Product.query.all():
+            saved_sku = product.skus.first()
+            offers_for_saved_sku = Offer.query.filter_by(sku=saved_sku).all()
+            all_skus = self._all_skus(offers_for_saved_sku[0].offer_url)
+            for found_sku in all_skus:
+                sku = SKU.query.filter_by(stock_code=found_sku).first()
+                if not sku:
+                    sku = SKU(stock_code=found_sku, base_product=product)
+                    self.create_offers_with_new_sku(offers_for_saved_sku, sku)
+                    new_offer = Offer.query.filter_by(sku=sku).first()
+                    self.find_all_photos(new_offer)
+                    db.session.add(sku)
         db.session.commit()
 
     def save_request_counter(self):

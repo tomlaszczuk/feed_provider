@@ -90,3 +90,9 @@ class Offer(db.Model):
         self.tariff_plan_code = tariff_plan_code
         self.contract_condition_code = contract_condition_code
         self.offer_url = self.build_url()
+
+    def __repr__(self):
+        return "%s; %s; %s; %s" % (
+            self.sku.stock_code, self.offer_code,
+            self.tariff_plan_code, self.contract_condition_code
+        )

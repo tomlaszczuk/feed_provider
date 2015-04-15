@@ -11,6 +11,9 @@ class Config:
                   "p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&" \
                   "p_p_resource_id=ajaxCall&p_p_cacheability=cacheLevelPage&" \
                   "p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2"
+    DEVICE_PRICES = "http://www.plus.pl/telefon?p_p_id=ajaxportlet_WAR_" \
+                    "frontend_INSTANCE_T3lq&p_p_lifecycle=2&" \
+                    "p_p_resource_id=devicesPrices"
 
     SEGMENTS = [
         "IND.NEW.POSTPAID.ACQ",

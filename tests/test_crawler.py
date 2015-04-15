@@ -52,7 +52,6 @@ class CrawlerTestCase(unittest.TestCase):
         self.assertIn("sku", device)
 
     def test_saving_devices(self):
-        # TODO Write this test
         offer_list = self.crawler.offer_list()
         offer = offer_list[0]
         devices = self.crawler.gather_devices(offer=offer, page=1)
@@ -89,3 +88,81 @@ class CrawlerTestCase(unittest.TestCase):
         self.assertEqual(o.price, 1234.456)
         self.assertIsNotNone(o.old_price)
         self.assertEqual(Photo.query.filter_by(default=True).count(), 1)
+
+    def test_another_sku(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2A", contract_condition_code="24A"
+        )
+        all_skus_codes = self.crawler._all_skus(offer.offer_url)
+        self.assertTrue(len(all_skus_codes) > 1)
+        self.assertIn('lg-g2-mini-lte-white', all_skus_codes)
+
+    def test_save_unsaved_sku(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        db.session.add_all([product, sku, offer])
+        db.session.commit()
+        self.crawler.save_or_update_skus()
+        self.assertTrue(len(Product.query.first().skus.all()) > 1)
+        self.assertIn(
+            SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first(),
+            Product.query.first().skus
+        )
+
+    def test_not_inserting_existing_sku(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        db.session.add_all([product, sku, offer])
+        db.session.commit()
+        self.crawler.save_or_update_skus()
+        self.assertEqual(
+            SKU.query.filter_by(stock_code="lg-g2-mini-lte-black").count(), 1
+        )
+
+    def test_new_found_sku_has_the_same_offer_codes_as_saved_sku(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        db.session.add_all([product, sku, offer])
+        db.session.commit()
+        self.crawler.save_or_update_skus()
+        self.assertTrue(Offer.query.count() > 1)
+        for i in range(Offer.query.count()):
+            self.assertEqual(Offer.query.get(i+1).offer_code, "NSZAS24A")
+
+    def test_new_found_sku_has_photos(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        db.session.add_all([product, sku, offer])
+        db.session.commit()
+        self.crawler.save_or_update_skus()
+        new_sku = SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first()
+        self.assertTrue(new_sku.photos.count() >= 1)
