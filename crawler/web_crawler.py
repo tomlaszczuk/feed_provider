@@ -179,6 +179,13 @@ class WebCrawler:
         self.request_counter += 1
         return r.json()["deviceAvailables"][0]["available"]
 
+    def update_availability(self):
+        """Used in a daily availability check"""
+        for sku in SKU.query.all():
+            sku.availability = self.check_availability(sku.stock_code)
+            db.session.add(sku)
+        db.session.commit()
+
     def save_request_counter(self):
         with open("logs/request_counter.txt", "a") as request_counter:
             now = str(datetime.datetime.now())

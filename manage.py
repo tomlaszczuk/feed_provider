@@ -50,5 +50,14 @@ def dev_crawl():
     print("It took %f seconds" % (end-start))
 
 
+@manager.command
+def dev_availability_check():
+    start = timer()
+    crawler = WebCrawler("IND.NEW.POSTPAID.MNP")
+    crawler.update_availability()
+    crawler.save_request_counter()
+    end = timer()
+    print("It took %f seconds" % (end - start))
+
 if __name__ == "__main__":
     manager.run()
