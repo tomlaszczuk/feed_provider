@@ -90,7 +90,7 @@ class WebCrawler:
         sku = SKU.query.filter_by(stock_code=device_info["sku"]).first()
         if not sku:
             sku = SKU(base_product=product, stock_code=device_info["sku"])
-
+        sku.availability = device_info["available"]
         # =================== Photo ======================= #
         for photo in device_info["imagesOnDetails"]:
             device_photo = Photo.query.filter_by(
@@ -123,7 +123,6 @@ class WebCrawler:
         offer.set_prices(
             float(device_info["prices"]["grossPrice"].replace(",", "."))
         )
-        offer.availability = device_info["available"]
         offer.abo_price = float(offer_info["monthlyFeeGross"].replace(",", "."))
         offer.priority = device_info["devicePriority"]
 

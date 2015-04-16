@@ -59,6 +59,7 @@ class CrawlerTestCase(unittest.TestCase):
         self.crawler.save_or_update_device(device_info=device, offer_info=offer)
         self.assertEqual(Product.query.count(), 1)
         self.assertEqual(SKU.query.count(), 1)
+        self.assertIsNotNone(SKU.query.first().availability)
         self.assertEqual(Offer.query.count(), 1)
         self.assertEqual(
             Photo.query.count(), len(device['imagesOnDetails'])
