@@ -95,7 +95,7 @@ class CrawlerTestCase(unittest.TestCase):
                           product_type="PHONE")
         sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
         offer = Offer(
-            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
             tariff_plan_code="15F2A", contract_condition_code="24A"
         )
@@ -108,7 +108,7 @@ class CrawlerTestCase(unittest.TestCase):
                           product_type="PHONE")
         sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
         offer = Offer(
-            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
             tariff_plan_code="15F2F", contract_condition_code="24A"
         )
@@ -130,7 +130,7 @@ class CrawlerTestCase(unittest.TestCase):
                           product_type="PHONE")
         sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
         offer = Offer(
-            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
             tariff_plan_code="15F2F", contract_condition_code="24A"
         )
@@ -146,7 +146,7 @@ class CrawlerTestCase(unittest.TestCase):
                           product_type="PHONE")
         sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
         offer = Offer(
-            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
             tariff_plan_code="15F2F", contract_condition_code="24A"
         )
@@ -162,7 +162,7 @@ class CrawlerTestCase(unittest.TestCase):
                           product_type="PHONE")
         sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
         offer = Offer(
-            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
             tariff_plan_code="15F2F", contract_condition_code="24A"
         )
@@ -177,7 +177,7 @@ class CrawlerTestCase(unittest.TestCase):
                           product_type="PHONE")
         sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
         offer = Offer(
-            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
             tariff_plan_code="15F2F", contract_condition_code="24A"
         )

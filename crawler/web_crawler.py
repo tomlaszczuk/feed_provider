@@ -113,7 +113,6 @@ class WebCrawler:
         ).first()
         if not offer:
             offer = Offer(
-                category=offer_info["offerSegmentationCode"],
                 segmentation=self.segment,
                 market=self.segment.split(".")[0],
                 sku=sku,
@@ -146,7 +145,6 @@ class WebCrawler:
             self.request_counter += 1
             if r.json()["devicesPrices"]:
                 new_offer = Offer(
-                    category=offer.category,
                     segmentation=offer.segmentation,
                     market=offer.market,
                     contract_condition_code=offer.contract_condition_code,

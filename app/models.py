@@ -57,7 +57,7 @@ class Offer(db.Model):
             self.price = scrapped_price
 
     def map_category(self):
-        if 'TABLET' in self.category:
+        if "TAB" in self.category:
             return "tablet-laptop"
         elif "MODEM" in self.category:
             return "modem-router"
@@ -80,15 +80,19 @@ class Offer(db.Model):
             + "&tariffPlanCode=" + tariff + "&offerNSICode=" + offer
         return url
 
-    def __init__(self, category, segmentation, market, sku, offer_code,
+    def generate_category(self):
+        return self.segmentation.replace(".", "-") + "-" \
+            + self.sku.base_product.product_type
+
+    def __init__(self, segmentation, market, sku, offer_code,
                  tariff_plan_code, contract_condition_code):
-        self.category = category
         self.segmentation = segmentation
         self.market = market
         self.sku = sku
         self.offer_code = offer_code
         self.tariff_plan_code = tariff_plan_code
         self.contract_condition_code = contract_condition_code
+        self.category = self.generate_category()
         self.offer_url = self.build_url()
 
     def __repr__(self):
