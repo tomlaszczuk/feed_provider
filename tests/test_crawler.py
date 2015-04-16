@@ -172,6 +172,25 @@ class CrawlerTestCase(unittest.TestCase):
         new_sku = SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first()
         self.assertTrue(new_sku.photos.count() >= 1)
 
+    def test_new_found_sku_has_abo_price_and_device_price(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        offer.abo_price = 100.00
+        offer.price = 90.00
+        db.session.add_all([product, sku, offer])
+        db.session.commit()
+        self.crawler.save_new_found_skus()
+        new_sku = SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first()
+        new_offer = Offer.query.filter_by(sku=new_sku).first()
+        self.assertEqual(new_offer.abo_price, 100.00)
+        self.assertEqual(new_offer.price, 90.00)
+
     def test_sku_availability_is_string_representation(self):
         product = Product(manufacturer="LG", model_name="G2 Mini",
                           product_type="PHONE")
