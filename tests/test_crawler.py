@@ -171,3 +171,20 @@ class CrawlerTestCase(unittest.TestCase):
         self.crawler.save_new_found_skus()
         new_sku = SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first()
         self.assertTrue(new_sku.photos.count() >= 1)
+
+    def test_sku_availability_is_string_representation(self):
+        product = Product(manufacturer="LG", model_name="G2 Mini",
+                          product_type="PHONE")
+        sku = SKU(base_product=product, stock_code="lg-g2-mini-lte-black")
+        offer = Offer(
+            category="CAT", segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        db.session.add_all([product, sku, offer])
+        db.session.commit()
+        self.crawler.save_new_found_skus()
+        new_sku = SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first()
+        self.assertIsInstance(new_sku.availability, str)
+        self.assertIn(new_sku.availability,
+                      ('AVAILABLE', 'NOT_AVAILABLE', 'RUNNING_OUT'))

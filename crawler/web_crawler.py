@@ -166,10 +166,7 @@ class WebCrawler:
                 sku = SKU.query.filter_by(stock_code=found_sku).first()
                 if not sku:
                     sku = SKU(stock_code=found_sku, base_product=product)
-                    if self.check_availability(sku.stock_code):
-                        sku.availability = True
-                    else:
-                        sku.availability = False
+                    sku.availability = self.check_availability(sku.stock_code)
                     self.create_offers_with_new_sku(offers_for_saved_sku, sku)
                     new_offer = Offer.query.filter_by(sku=sku).first()
                     self.find_all_photos(new_offer)
@@ -180,9 +177,7 @@ class WebCrawler:
         r = requests.post(url=Config.DEVICE_AVAILABLE,
                           data={"deviceStockCode": sku_stock_code})
         self.request_counter += 1
-        if r.json()["deviceAvailables"][0]["available"] == "NOT_AVAILABLE":
-            return False
-        return True
+        return r.json()["deviceAvailables"][0]["available"]
 
     def save_request_counter(self):
         with open("logs/request_counter.txt", "a") as request_counter:

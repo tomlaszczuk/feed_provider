@@ -21,7 +21,7 @@ class SKU(db.Model):
     color = db.Column(db.String(32))
     photos = db.relationship('Photo', backref='sku', lazy='dynamic')
     offers = db.relationship('Offer', backref='sku', lazy='dynamic')
-    availability = db.Column(db.Boolean)
+    availability = db.Column(db.String(32))
 
     def __repr__(self):
         return self.stock_code
