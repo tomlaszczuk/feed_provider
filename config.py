@@ -14,6 +14,9 @@ class Config:
     DEVICE_PRICES = "http://www.plus.pl/telefon?p_p_id=ajaxportlet_WAR_" \
                     "frontend_INSTANCE_T3lq&p_p_lifecycle=2&" \
                     "p_p_resource_id=devicesPrices"
+    DEVICE_AVAILABLE = "http://www.plus.pl/telefon?p_p_id=ajaxportlet_WAR_" \
+                       "frontend_INSTANCE_T3lq&p_p_lifecycle=2&p_p_resource_" \
+                       "id=deviceAvailable"
 
     SEGMENTS = [
         "IND.NEW.POSTPAID.ACQ",

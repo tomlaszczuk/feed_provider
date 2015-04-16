@@ -120,6 +120,10 @@ class CrawlerTestCase(unittest.TestCase):
             SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first(),
             Product.query.first().skus
         )
+        self.assertIsNotNone(
+            SKU.query.filter_by(
+                stock_code="lg-g2-mini-lte-white").first().availability
+        )
 
     def test_not_inserting_existing_sku(self):
         product = Product(manufacturer="LG", model_name="G2 Mini",
