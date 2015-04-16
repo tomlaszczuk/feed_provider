@@ -31,7 +31,7 @@ class Photo(db.Model):
     __tablename__ = 'photos'
     id = db.Column(db.Integer, primary_key=True)
     sku_id = db.Column(db.Integer, db.ForeignKey('skus.id'))
-    url = db.Column(db.String(255), unique=True)
+    url = db.Column(db.String(255))
     default = db.Column(db.Boolean, index=True)
 
 

@@ -63,7 +63,8 @@ class WebCrawler:
         self.request_counter += 1
         html = r.content
         parsed_html = Soup(html)
-        photo_container = parsed_html.find('div', attrs={'id': 'phone-carousel'})
+        photo_container = parsed_html.find('div',
+                                           attrs={'id': 'phone-carousel'})
         imgs = photo_container.find_all('img')
         main_photo = Photo(sku=offer.sku, url=imgs[0].attrs['src'],
                            default=True)
