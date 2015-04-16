@@ -157,7 +157,7 @@ class WebCrawler:
                 db.session.add(new_offer)
         db.session.commit()
 
-    def save_or_update_skus(self):
+    def save_new_found_skus(self):
         for product in Product.query.all():
             saved_sku = product.skus.first()
             offers_for_saved_sku = Offer.query.filter_by(sku=saved_sku).all()

@@ -113,7 +113,7 @@ class CrawlerTestCase(unittest.TestCase):
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
-        self.crawler.save_or_update_skus()
+        self.crawler.save_new_found_skus()
         self.assertTrue(len(Product.query.first().skus.all()) > 1)
         self.assertIn(
             SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first(),
@@ -131,7 +131,7 @@ class CrawlerTestCase(unittest.TestCase):
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
-        self.crawler.save_or_update_skus()
+        self.crawler.save_new_found_skus()
         self.assertEqual(
             SKU.query.filter_by(stock_code="lg-g2-mini-lte-black").count(), 1
         )
@@ -147,7 +147,7 @@ class CrawlerTestCase(unittest.TestCase):
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
-        self.crawler.save_or_update_skus()
+        self.crawler.save_new_found_skus()
         self.assertTrue(Offer.query.count() > 1)
         for i in range(Offer.query.count()):
             self.assertEqual(Offer.query.get(i+1).offer_code, "NSZAS24A")
@@ -163,6 +163,6 @@ class CrawlerTestCase(unittest.TestCase):
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
-        self.crawler.save_or_update_skus()
+        self.crawler.save_new_found_skus()
         new_sku = SKU.query.filter_by(stock_code="lg-g2-mini-lte-white").first()
         self.assertTrue(new_sku.photos.count() >= 1)

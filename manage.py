@@ -44,7 +44,7 @@ def dev_crawl():
             devices = crawler.gather_devices(offer, i+1)
             for device in devices:
                 crawler.save_or_update_device(device, offer)
-    crawler.save_or_update_skus()
+    crawler.save_new_found_skus()
     crawler.save_request_counter()
     end = timer()
     print("It took %f seconds" % (end-start))
