@@ -152,6 +152,9 @@ class WebCrawler:
                     tariff_plan_code=offer.tariff_plan_code,
                     offer_code=offer.offer_code
                 )
+                new_offer.priority = offer.priority
+                new_offer.set_prices(offer.price)
+                new_offer.abo_price = offer.abo_price
                 db.session.add(new_offer)
         db.session.commit()
 
