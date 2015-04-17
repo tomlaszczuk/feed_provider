@@ -1,13 +1,14 @@
 import unittest
-from app import app, db
+from app import create_app, db
 from app.models import Product, Photo, Offer, SKU
 from config import config
 
 
 class OfferModelTestCase(unittest.TestCase):
     def setUp(self):
-        self.app = app
-        self.app.config.from_object(config['testing'])
+        self.app = create_app('testing')
+        self.app_context = self.app.app_context()
+        self.app_context.push()
         db.create_all()
         self.phone = Product(manufacturer='LG', model_name='G2 mini LTE',
                              product_type='PHONE')
@@ -21,6 +22,7 @@ class OfferModelTestCase(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        self.app_context.pop()
 
     def test_category_generator(self):
         offer_1 = Offer(segmentation='IND.NEW.POSTPAID.ACQ',

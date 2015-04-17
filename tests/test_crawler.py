@@ -2,20 +2,22 @@ import unittest
 from config import config
 from crawler.web_crawler import WebCrawler
 
-from app import db, app
+from app import db, create_app
 from app.models import Product, Photo, SKU, Offer
 
 
 class CrawlerTestCase(unittest.TestCase):
     def setUp(self):
-        self.app = app
-        self.app.config.from_object(config['testing'])
+        self.app = create_app('testing')
+        self.app_context = self.app.app_context()
+        self.app_context.push()
         self.crawler = WebCrawler(segment="IND.NEW.POSTPAID.ACQ")
         db.create_all()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        self.app_context.pop()
 
     def test_offers_list_gatherer(self):
         offer_list = self.crawler.offer_list()

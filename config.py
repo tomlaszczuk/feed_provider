@@ -28,6 +28,9 @@ class Config:
         "SOHO.NEW.POSTPAID.MNP"
     ]
 
+    def init_app(self):
+        pass
+
 
 class DevelopmentConfig(Config):
     DEBUG = True

@@ -6,11 +6,11 @@ from timeit import default_timer as timer
 from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
 
-from app import app, db, models
+from app import create_app, db, models
 from config import config
 from crawler.web_crawler import WebCrawler
 
-app.config.from_object(config[os.getenv("FLASK_CONFIG") or "default"])
+app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 manager = Manager(app)
 migrate = Migrate(app, db)
