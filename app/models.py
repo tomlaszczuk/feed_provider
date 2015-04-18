@@ -1,3 +1,4 @@
+from flask import url_for
 from . import db
 
 
@@ -9,8 +10,29 @@ class Product(db.Model):
     product_type = db.Column(db.String(32))
     skus = db.relationship('SKU', backref='base_product', lazy='dynamic')
 
+    def get_full_product_name(self):
+        return "%s %s" % (self.manufacturer, self.model_name)
+
+    def to_json(self):
+        json_product = {
+            'id': self.id,
+            'url': url_for('api.get_product', pk=self.id, _external=True),
+            'manufacturer': self.manufacturer,
+            'model_name': self.model_name,
+            'product_type': self.product_type,
+            'skus': [
+                {
+                    s.stock_code: url_for(
+                        'api.get_sku', stock_code=s.stock_code, _external=True
+                    )
+                } for s in self.skus
+            ],
+            'sku_count': self.skus.count()
+        }
+        return json_product
+
     def __repr__(self):
-        return self.manufacturer + self.model_name
+        return self.get_full_product_name()
 
 
 class SKU(db.Model):
@@ -22,6 +44,19 @@ class SKU(db.Model):
     photos = db.relationship('Photo', backref='sku', lazy='dynamic')
     offers = db.relationship('Offer', backref='sku', lazy='dynamic')
     availability = db.Column(db.String(32))
+
+    def to_json(self):
+        sku_json = {
+            'url': url_for('api.get_sku', stock_code=self.stock_code,
+                           _external=True),
+            'stock_code': self.stock_code,
+            'product': {
+                self.base_product.get_full_product_name():
+                url_for('api.get_product', pk=self.base_product_id,
+                        _external=True)
+            }
+        }
+        return sku_json
 
     def __repr__(self):
         return self.stock_code
