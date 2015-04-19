@@ -80,3 +80,29 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertEqual(len(json_response["offers"]), 0)
+
+    def test_post_product(self):
+        # create new product
+        response = self.client.post(
+            url_for('api.post_product'),
+            data=json.dumps({
+                'manufacturer': 'Super Brand',
+                'model_name': 'Model 2000',
+                'product_type': 'PHONE'
+            })
+        )
+        self.assertEqual(response.status_code, 201)
+        url = response.headers.get('Location')
+        self.assertIsNotNone(url)
+
+        # get this product
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['url'], url)
+        self.assertEqual(json_response['manufacturer'], 'Super Brand')
+        self.assertEqual(json_response['model_name'], 'Model 2000')
+        self.assertEqual(len(json_response['skus']), 0)
+
+    def test_post_sku(self):
+        pass

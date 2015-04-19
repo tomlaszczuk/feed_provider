@@ -1,5 +1,12 @@
 from flask import url_for
 from . import db
+from .exceptions import ValidationError
+
+
+def is_allowed_product_type(product_type):
+    ALLOWED_TYPES = ('PHONE', 'TAB', 'RETAIL',
+                     'MODEM', 'SIM_CARD', 'BUNDLE')
+    return product_type in ALLOWED_TYPES
 
 
 class Product(db.Model):
@@ -30,6 +37,23 @@ class Product(db.Model):
             'sku_count': self.skus.count()
         }
         return json_product
+
+    @staticmethod
+    def from_json(json_product):
+        manufacturer = json_product.get('manufacturer')
+        model_name = json_product.get('model_name')
+        product_type = json_product.get('product_type')
+        if manufacturer is None or manufacturer == '' \
+                or model_name is None or model_name == '':
+            raise ValidationError(
+                'Product does not have manufacturer or model name'
+            )
+        if not is_allowed_product_type(product_type):
+            raise ValidationError(
+                'Product type is not allowed'
+            )
+        return Product(manufacturer=manufacturer, model_name=model_name,
+                       product_type=product_type)
 
     def __repr__(self):
         return self.get_full_product_name()
@@ -159,7 +183,8 @@ class Offer(db.Model):
                 self.sku.stock_code:
                     url_for('api.get_sku', stock_code=self.sku.stock_code,
                             _external=True)
-            }
+            },
+            'url': url_for('api.get_offer', pk=self.id, _external=True)
         }
         return offer_json
 
