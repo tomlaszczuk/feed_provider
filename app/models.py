@@ -102,6 +102,10 @@ class SKU(db.Model):
             raise ValidationError('stock_code is missing')
         if json_sku.get('photos') is None or json_sku.get('photos') == []:
             raise ValidationError('sku cannot be saved without photos provided')
+        for photo in json_sku.get('photos'):
+            if 'default' not in photo.keys() or 'url' not in photo.keys():
+                raise ValidationError('photo must have both default '
+                                      'info and url address')
         return SKU(stock_code=stock_code)
 
     def __repr__(self):
