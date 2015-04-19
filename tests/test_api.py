@@ -105,4 +105,45 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(len(json_response['skus']), 0)
 
     def test_post_sku(self):
-        pass
+        # create new product
+        p = Product(manufacturer='LG', model_name='G2 Mini',
+                    product_type='PHONE')
+        db.session.add(p)
+        db.session.commit()
+
+        # create new sku for that product
+        stock_code = 'lg-g2-mini-lte-black'
+        response = self.client.post(
+            url_for('api.post_sku', pk=p.id),
+            data=json.dumps({
+                'stock_code': stock_code,
+                'availability': 'AVAILABLE',
+                'photos': [
+                    {'default': True, 'url': 'http://some.photo.com'},
+                    {'default': False, 'url': 'http://another.photo.com'}
+                ]
+            })
+        )
+        self.assertEqual(response.status_code, 201)
+        url = response.headers.get('Location')
+        self.assertIsNotNone(url)
+
+        # get newly created sku
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['url'], url)
+        self.assertEqual(json_response['stock_code'], stock_code)
+        self.assertEqual(len(json_response['photos']), 2)
+
+        # check if photos are saved in database
+        self.assertEqual(Photo.query.count(), 2)
+
+        # get product and assure that we see newly created sku
+        response = self.client.get(url_for('api.get_product', pk=p.id))
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(len(json_response['skus']), 1)
+
+        self.assertEqual(json_response['skus'][0][stock_code],
+                         url_for('api.get_sku', stock_code=stock_code,
+                                 _external=True))

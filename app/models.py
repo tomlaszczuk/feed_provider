@@ -95,6 +95,15 @@ class SKU(db.Model):
         }
         return sku_json
 
+    @staticmethod
+    def from_json(json_sku):
+        stock_code = json_sku.get('stock_code')
+        if stock_code is None or stock_code == '':
+            raise ValidationError('stock_code is missing')
+        if json_sku.get('photos') is None or json_sku.get('photos') == []:
+            raise ValidationError('sku cannot be saved without photos provided')
+        return SKU(stock_code=stock_code)
+
     def __repr__(self):
         return self.stock_code
 
