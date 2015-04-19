@@ -38,3 +38,45 @@ class ApiTestCase(unittest.TestCase):
         self.assertIsInstance(json_response["skus"], list)
         self.assertEqual(len(json_response["skus"]), 2)
         self.assertIn("nokia-lumia-520-black", json_response["skus"][0])
+
+    def test_get_skus(self):
+        p = Product(manufacturer="Nokia", model_name="Lumia 520",
+                    product_type="PHONE")
+        sku_1 = SKU(base_product=p, stock_code="nokia-lumia-520-black",
+                    availability="AVAILABLE")
+        sku_2 = SKU(base_product=p, stock_code="nokia-lumia-520-red",
+                    availability="NOT_AVAILABLE")
+        photo_1 = Photo(sku=sku_1, default=True, url="http://some-photo.com")
+        photo_2 = Photo(sku=sku_2, default=True, url="http://some-photo.com")
+        offer_1 = Offer(
+            segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku_1, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        offer_2 = Offer(
+            segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku_1, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F3F", contract_condition_code="24A"
+        )
+
+        db.session.add_all([sku_1, sku_2, photo_1, photo_2, offer_1, offer_2])
+        db.session.commit()
+
+        # get sku
+        response = self.client.get(url_for('api.get_sku',
+                                           stock_code=sku_1.stock_code))
+        self.assertEqual(response.status_code, 200)
+
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response["stock_code"], "nokia-lumia-520-black")
+        self.assertIsInstance(json_response["photos"], list)
+        self.assertEqual(len(json_response["photos"]), 1)
+        self.assertEqual(json_response["availability"], "AVAILABLE")
+        self.assertIsInstance(json_response["offers"], list)
+        self.assertEqual(len(json_response["offers"]), 2)
+
+        response = self.client.get(url_for('api.get_sku',
+                                           stock_code=sku_2.stock_code))
+        self.assertEqual(response.status_code, 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(len(json_response["offers"]), 0)

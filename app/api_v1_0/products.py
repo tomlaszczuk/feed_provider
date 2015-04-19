@@ -11,5 +11,5 @@ def get_product(pk):
 
 @api.route('/products/')
 def get_products():
-    products = Product.query.all()
+    products = Product.query.order_by(Product.id)
     return jsonify({'products': [product.to_json() for product in products]})

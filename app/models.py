@@ -47,6 +47,8 @@ class SKU(db.Model):
 
     def to_json(self):
         sku_json = {
+            'id': self.id,
+            'availability': self.availability,
             'url': url_for('api.get_sku', stock_code=self.stock_code,
                            _external=True),
             'stock_code': self.stock_code,
@@ -54,7 +56,18 @@ class SKU(db.Model):
                 self.base_product.get_full_product_name():
                 url_for('api.get_product', pk=self.base_product_id,
                         _external=True)
-            }
+            },
+            'photos': [
+                {'default': photo.default, 'url': photo.url}
+                for photo in self.photos
+            ],
+            'offers': [
+                {
+                    offer.tariff_plan_code: url_for(
+                        'api.get_offer', pk=offer.id, _external=True)
+                }
+                for offer in self.offers
+            ]
         }
         return sku_json
 
@@ -129,6 +142,26 @@ class Offer(db.Model):
         self.contract_condition_code = contract_condition_code
         self.category = self.generate_category()
         self.offer_url = self.build_url()
+
+    def to_json(self):
+        offer_json = {
+            'id': self.id,
+            'category': self.category,
+            'segmentation': self.segmentation,
+            'market': self.market,
+            'product_price': self.price,
+            'monthly_price': self.abo_price,
+            'offer_nsi_code': self.offer_code,
+            'tariff_plan_code': self.tariff_plan_code,
+            'contract_condition': self.contract_condition_code,
+            'product_page': self.offer_url,
+            'sku': {
+                self.sku.stock_code:
+                    url_for('api.get_sku', stock_code=self.sku.stock_code,
+                            _external=True)
+            }
+        }
+        return offer_json
 
     def __repr__(self):
         return "%s; %s; %s; %s" % (

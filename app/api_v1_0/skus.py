@@ -7,3 +7,9 @@ from ..models import SKU
 def get_sku(stock_code):
     sku = SKU.query.filter_by(stock_code=stock_code).first()
     return jsonify(sku.to_json())
+
+
+@api.route('/skus/')
+def get_skus():
+    skus = SKU.query.order_by(SKU.id)
+    return jsonify({'skus': [sku.to_json() for sku in skus]})
