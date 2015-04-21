@@ -9,6 +9,12 @@ def is_allowed_product_type(product_type):
     return product_type in ALLOWED_TYPES
 
 
+def check_if_it_is_there(*args):
+    for arg in args:
+        if arg is None or arg == '':
+            raise ValidationError('not enough data to build offer')
+
+
 class Product(db.Model):
     __tablename__ = 'models'
     id = db.Column(db.Integer, primary_key=True)
@@ -199,6 +205,27 @@ class Offer(db.Model):
             },
             'url': url_for('api.get_offer', pk=self.id, _external=True)
         }
+        return offer_json
+
+    @staticmethod
+    def validate_offer_json(offer_json):
+        segmentation = offer_json.get('segmentation')
+        tariff_plan = offer_json.get('tariff_plan_code')
+        offer_code = offer_json.get('offer_nsi_code')
+        contract_condition = offer_json.get('contract_condition')
+        product_price = offer_json.get('product_price')
+        monthly_price = offer_json.get('monthly_price')
+        if monthly_price == '':
+            raise ValidationError('price cannot be an empty string')
+        check_if_it_is_there(segmentation, tariff_plan, offer_code,
+                             product_price, contract_condition)
+        if monthly_price is None:
+            tariff = Offer.query.filter_by(tariff_plan_code=tariff_plan).first()
+            if not tariff:
+                raise ValidationError('providing new tariff plan you must '
+                                      'provide monthly price')
+            monthly_price = tariff.abo_price
+            offer_json['monthly_price'] = monthly_price
         return offer_json
 
     def __repr__(self):
