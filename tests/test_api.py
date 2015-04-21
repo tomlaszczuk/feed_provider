@@ -81,6 +81,23 @@ class ApiTestCase(unittest.TestCase):
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertEqual(len(json_response["offers"]), 0)
 
+    def test_get_skus_for_product(self):
+        product = Product(model_name='Lumia 520', manufacturer='Nokia',
+                          product_type='PHONE')
+        db.session.add(product)
+        sku_1 = SKU(stock_code='nokia-lumia-520-black')
+        sku_2 = SKU(stock_code='nokia-lumia-520-yellow', base_product=product)
+        db.session.add_all([sku_1, sku_2])
+        db.session.commit()
+
+        response = self.client.get(url_for('api.get_skus_for_product',
+                                           pk=product.id))
+        self.assertEqual(response.status_code, 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['skus'][0]['stock_code'],
+                         'nokia-lumia-520-yellow')
+        self.assertEqual(len(json_response['skus']), 1)
+
     def test_post_product(self):
         # create new product
         response = self.client.post(

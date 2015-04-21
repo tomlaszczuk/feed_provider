@@ -16,6 +16,13 @@ def get_skus():
     return jsonify({'skus': [sku.to_json() for sku in skus]})
 
 
+@api.route('/product/<int:pk>/skus/', methods=['GET'])
+def get_skus_for_product(pk):
+    product = Product.query.get(pk)
+    skus = SKU.query.filter_by(base_product=product).order_by(SKU.id)
+    return jsonify({'skus': [sku.to_json() for sku in skus]})
+
+
 @api.route('/product/<int:pk>/skus/', methods=['POST'])
 def post_sku(pk):
     product = Product.query.get(pk)
