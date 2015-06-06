@@ -40,7 +40,7 @@ class CrawlerTestCase(unittest.TestCase):
     def test_device_gatherer(self):
         offer = {
             "offerNSICode": "NSZAS24A",
-            "tariffPlanCode": "15F2A",
+            "tariffPlanCode": "5F20A",
             "contractConditionCode": "24A"
         }
         page = 5
@@ -99,7 +99,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2A", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         all_skus_codes = self.crawler._all_skus(offer.offer_url)
         self.assertTrue(len(all_skus_codes) > 1)
@@ -112,7 +112,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2F", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
@@ -134,7 +134,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2F", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
@@ -150,7 +150,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2F", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
@@ -166,7 +166,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2F", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()
@@ -181,7 +181,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2F", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         offer.abo_price = 100.00
         offer.price = 90.00
@@ -200,7 +200,7 @@ class CrawlerTestCase(unittest.TestCase):
         offer = Offer(
             segmentation="IND.NEW.POSTPAID.ACQ",
             sku=sku, market="IND", offer_code="NSZAS24A",
-            tariff_plan_code="15F2F", contract_condition_code="24A"
+            tariff_plan_code="5F20A", contract_condition_code="24A"
         )
         db.session.add_all([product, sku, offer])
         db.session.commit()

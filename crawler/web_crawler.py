@@ -22,6 +22,9 @@ class WebCrawler:
         return offers
 
     def pages(self, offer):
+        """
+        param: offer - one offer from offer list scrapped by offer_list method
+        """
         r = requests.post(
             Config.DEVICE_LIST,
             data={"processSegmentation": self.segment,
@@ -48,7 +51,7 @@ class WebCrawler:
 
     def _all_skus(self, product_url):
         """
-        Slow. Many requests Use only when necessary
+        Slow. Many requests. Use only when necessary
         Find all skus for given product url
         """
         r = requests.get(url=product_url)
@@ -132,7 +135,7 @@ class WebCrawler:
         db.session.add(offer)
         db.session.commit()
 
-    def create_offers_with_new_sku(self, offer_list, sku):
+    def _create_offers_with_new_sku(self, offer_list, sku):
         for offer in offer_list:
             r = requests.post(
                 url=Config.DEVICE_PRICES,
@@ -168,7 +171,7 @@ class WebCrawler:
                 if not sku:
                     sku = SKU(stock_code=found_sku, base_product=product)
                     sku.availability = self.check_availability(sku.stock_code)
-                    self.create_offers_with_new_sku(offers_for_saved_sku, sku)
+                    self._create_offers_with_new_sku(offers_for_saved_sku, sku)
                     new_offer = Offer.query.filter_by(sku=sku).first()
                     self.find_all_photos(new_offer)
                     db.session.add(sku)
