@@ -20,7 +20,10 @@ class CrawlerTestCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_offers_list_gatherer(self):
-        offer_list = self.crawler.offer_list()
+        contract_conditions = self.crawler.available_contract_conditions()
+        offer_list = self.crawler.offer_list(
+            contract_conditions=contract_conditions
+        )
         self.assertIsNotNone(offer_list)
         one_offer = offer_list[0]
         self.assertIn("tariffPlanCode", one_offer)
@@ -54,7 +57,10 @@ class CrawlerTestCase(unittest.TestCase):
         self.assertIn("sku", device)
 
     def test_saving_devices(self):
-        offer_list = self.crawler.offer_list()
+        contract_conditions = self.crawler.available_contract_conditions()
+        offer_list = self.crawler.offer_list(
+            contract_conditions=contract_conditions
+        )
         offer = offer_list[0]
         devices = self.crawler.gather_devices(offer=offer, page=1)
         device = devices[0]
@@ -69,7 +75,10 @@ class CrawlerTestCase(unittest.TestCase):
         self.assertEqual(Photo.query.filter_by(default=True).count(), 1)
 
     def test_is_updating_existing_rows(self):
-        offer_list = self.crawler.offer_list()
+        contract_conditions = self.crawler.available_contract_conditions()
+        offer_list = self.crawler.offer_list(
+            contract_conditions=contract_conditions
+        )
         offer = offer_list[0]
         devices = self.crawler.gather_devices(offer=offer, page=1)
         device = devices[0]

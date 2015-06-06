@@ -37,7 +37,8 @@ def dev_crawl():
     """Mini crawl for one process used to populate dev database"""
     start = timer()
     crawler = WebCrawler("IND.NEW.POSTPAID.MNP")
-    offers = crawler.offer_list()
+    contract_conditions = crawler.available_contract_conditions()
+    offers = crawler.offer_list(contract_conditions=contract_conditions)
     for offer in offers:
         pages = crawler.pages(offer)
         for i in range(pages):

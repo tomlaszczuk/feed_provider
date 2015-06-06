@@ -13,12 +13,31 @@ class WebCrawler:
         self.segment = segment
         self.request_counter = 0
 
-    def offer_list(self):
+    def available_contract_conditions(self):
+        contract_conditions = []
         r = requests.post(Config.DEVICE_LIST,
                           data={"processSegmentationCode": self.segment})
         self.request_counter += 1
         devices_json = r.json()
-        offers = devices_json['rotator']
+        available_cc = devices_json['pageInfo']['availableContractConditions']
+        for cc in available_cc:
+            contract_conditions.append(cc["value"].split()[0] + "A")
+        return contract_conditions
+
+    def offer_list(self, contract_conditions):
+        offers = []
+        for contract_condition in contract_conditions:
+            r = requests.post(
+                Config.DEVICE_LIST,
+                data={
+                    "processSegmentationCode": self.segment,
+                    "contractConditionCode": contract_condition
+                }
+            )
+            self.request_counter += 1
+            devices_json = r.json()
+            for offer in devices_json['rotator']:
+                offers.append(offer)
         return offers
 
     def pages(self, offer):
