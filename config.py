@@ -29,9 +29,6 @@ class Config:
         "IND.SUB.SAT.POSTPAID"
     ]
 
-    def init_app(self):
-        pass
-
 
 class DevelopmentConfig(Config):
     DEBUG = True
