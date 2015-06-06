@@ -52,6 +52,7 @@ def dev_crawl():
 
 @manager.command
 def dev_availability_check():
+    """Mini crawl for one process used to check availability"""
     start = timer()
     crawler = WebCrawler("IND.NEW.POSTPAID.MNP")
     crawler.update_availability()

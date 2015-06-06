@@ -25,7 +25,8 @@ class Config:
         "IND.SUB.MIG.POSTPAID",
         "IND.SUB.MIG.MIX",
         "SOHO.NEW.POSTPAID.ACQ",
-        "SOHO.NEW.POSTPAID.MNP"
+        "SOHO.NEW.POSTPAID.MNP",
+        "IND.SUB.SAT.POSTPAID"
     ]
 
     def init_app(self):
