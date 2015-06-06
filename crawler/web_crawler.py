@@ -36,8 +36,7 @@ class WebCrawler:
             )
             self.request_counter += 1
             devices_json = r.json()
-            for offer in devices_json['rotator']:
-                offers.append(offer)
+            offers.extend(devices_json['rotator'])
         return offers
 
     def pages(self, offer):
