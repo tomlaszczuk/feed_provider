@@ -10,9 +10,15 @@ def is_allowed_product_type(product_type):
 
 
 def check_if_it_is_there(*args):
+    missing = []
     for arg in args:
         if arg is None or arg == '':
-            raise ValidationError('not enough data to build offer')
+            missing.append(arg)
+    if missing:
+        raise ValidationError(
+            'not enough data to build offer, missing: %s'
+            % missed for missed in missing
+        )
 
 
 class Product(db.Model):
