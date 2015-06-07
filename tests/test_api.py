@@ -243,3 +243,28 @@ class ApiTestCase(unittest.TestCase):
             })
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_get_offers_for_sku(self):
+        product = Product(model_name='Lumia 520', manufacturer='Nokia',
+                          product_type='PHONE')
+        db.session.add(product)
+        sku_1 = SKU(stock_code='nokia-lumia-520-black', base_product=product)
+        sku_2 = SKU(stock_code='nokia-lumia-520-white', base_product=product)
+        db.session.add_all([sku_1, sku_2])
+        offer_1 = Offer(
+            segmentation="IND.NEW.POSTPAID.ACQ",
+            sku=sku_1, market="IND", offer_code="NSZAS24A",
+            tariff_plan_code="15F2F", contract_condition_code="24A"
+        )
+        offer_2 = Offer(
+            segmentation="SOHO.NEW.POSTPAID.ACQ",
+            sku=sku_1, market="SOHO", offer_code="XSEAT24B",
+            tariff_plan_code="14J90", contract_condition_code="24A"
+        )
+        db.session.add_all([offer_1, offer_2])
+        db.session.commit()
+        response = self.client.get(url_for('api.get_offers_for_sku',
+                                           stock_code=sku_1.stock_code))
+        self.assertEqual(response.status_code, 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(len(json_response['offers']), 2)

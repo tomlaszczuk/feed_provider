@@ -16,6 +16,13 @@ def get_offers():
     return jsonify({'offers': [offer.to_json() for offer in offers]})
 
 
+@api.route('/sku/<stock_code>/offers', methods=['GET'])
+def get_offers_for_sku(stock_code):
+    sku = SKU.query.filter_by(stock_code=stock_code).first()
+    offers = Offer.query.filter_by(sku=sku).order_by(Offer.id)
+    return jsonify({'offers': [offer.to_json() for offer in offers]})
+
+
 @api.route('/sku/<stock_code>/offers/', methods=['POST'])
 def post_offer(stock_code):
     sku = SKU.query.filter_by(stock_code=stock_code).first()
