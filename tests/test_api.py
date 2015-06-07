@@ -132,6 +132,60 @@ class ApiTestCase(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_edit_product(self):
+        # create new product
+        response = self.client.post(
+            url_for('api.post_product'),
+            data=json.dumps({
+                'manufacturer': 'Super Brand',
+                'model_name': 'Model 2000',
+                'product_type': 'PHONE'
+            })
+        )
+        self.assertEqual(response.status_code, 201)
+        url = response.headers.get('Location')
+        json_response = json.loads(response.data.decode('utf-8'))
+        product_id = json_response['id']
+        self.assertIsNotNone(url)
+
+        # edit newly created product
+        response = self.client.put(
+            url_for('api.edit_product', pk=product_id),
+            data=json.dumps({
+                'product_type': 'TAB'
+            })
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # edit newly crerated product with forbidden product type
+        response = self.client.put(
+            url_for('api.edit_product', pk=product_id),
+            data=json.dumps({
+                'product_type': 'Garbage'
+            })
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # editing model name and manufacturer is impossible, but it won't throw
+        # an exception
+        response = self.client.put(
+            url_for('api.edit_product', pk=product_id),
+            data=json.dumps({
+                'product_type': 'TAB',
+                'manufacturer': 'Extra Brand',
+                'model_name': 'Model 2010',
+            })
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # get this product
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['product_type'], 'TAB')
+        self.assertEqual(json_response['manufacturer'], 'Super Brand')
+        self.assertEqual(json_response['model_name'], 'Model 2000')
+
     def test_post_sku(self):
         # create new product
         p = Product(manufacturer='LG', model_name='G2 Mini',

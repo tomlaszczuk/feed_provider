@@ -1,7 +1,8 @@
 from flask import jsonify, request, url_for
 from . import api
 from .. import db
-from ..models import Product
+from ..models import Product, is_allowed_product_type
+from ..exceptions import ValidationError
 
 
 @api.route("/product/<int:pk>/", methods=['GET'])
@@ -24,3 +25,15 @@ def post_product():
     db.session.commit()
     return jsonify(product.to_json()), 201, \
         {'Location': url_for('api.get_product', pk=product.id, _external=True)}
+
+
+@api.route('/product/<int:pk>/', methods=['PUT'])
+def edit_product(pk):
+    product = Product.query.get(pk)
+    req_json = request.get_json(force=True)
+    if not is_allowed_product_type(req_json.get('product_type')):
+        raise ValidationError("Invalid product type")
+    product.product_type = req_json['product_type']
+    db.session.add(product)
+    db.session.commit()
+    return jsonify(product.to_json())
