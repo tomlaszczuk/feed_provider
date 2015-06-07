@@ -147,6 +147,11 @@ class Offer(db.Model):
     offer_code = db.Column(db.String(16), index=True)
     contract_condition_code = db.Column(db.String(3), index=True)
     priority = db.Column(db.Integer)
+    scrapping_date = db.Column(db.DateTime())
+
+    def ping(self, date):
+        self.scrapping_date = date
+        db.session.add(self)
 
     def set_prices(self, scrapped_price):
         if scrapped_price != self.price:

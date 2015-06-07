@@ -12,6 +12,7 @@ class WebCrawler:
     def __init__(self, segment):
         self.segment = segment
         self.request_counter = 0
+        self.scrapping_time = datetime.datetime.utcnow()
 
     def available_contract_conditions(self):
         contract_conditions = []
@@ -38,6 +39,16 @@ class WebCrawler:
             devices_json = r.json()
             offers.extend(devices_json['rotator'])
         return offers
+
+    def mark_inactive_offers(self, offer_codes_list):
+        """
+        :param offer_list: list of scrapped offer codes in segmentation
+        """
+        for offer in Offer.query.filter_by(segmentation=self.segment).all():
+            if offer.offer_code not in offer_codes_list:
+                offer.is_active = False
+                db.session.add(offer)
+        db.session.commit()
 
     def pages(self, offer):
         """
@@ -150,7 +161,7 @@ class WebCrawler:
         # =================== Saving ======================= #
         db.session.add(product)
         db.session.add(sku)
-        db.session.add(offer)
+        offer.ping(self.scrapping_time)
         db.session.commit()
 
     def _create_offers_with_new_sku(self, offer_list, sku):
