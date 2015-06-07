@@ -7,7 +7,7 @@ from ..exceptions import ValidationError
 
 @api.route("/product/<int:pk>/", methods=['GET'])
 def get_product(pk):
-    product = Product.query.get(pk)
+    product = Product.query.get_or_404(pk)
     return jsonify(product.to_json())
 
 
@@ -29,7 +29,7 @@ def post_product():
 
 @api.route('/product/<int:pk>/', methods=['PUT'])
 def edit_product(pk):
-    product = Product.query.get(pk)
+    product = Product.query.get_or_404(pk)
     req_json = request.get_json(force=True)
     if not is_allowed_product_type(req_json.get('product_type')):
         raise ValidationError("Invalid product type")

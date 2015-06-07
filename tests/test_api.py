@@ -186,6 +186,12 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(json_response['manufacturer'], 'Super Brand')
         self.assertEqual(json_response['model_name'], 'Model 2000')
 
+    def test_not_existing_product(self):
+        response = self.client.get(url_for('api.get_product', pk=100))
+        self.assertEqual(response.status_code, 404)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['error'], 'not found')
+
     def test_post_sku(self):
         # create new product
         p = Product(manufacturer='LG', model_name='G2 Mini',
@@ -279,6 +285,13 @@ class ApiTestCase(unittest.TestCase):
             {'default': True, 'url': 'http://some.photo.com'},
             json_response['photos']
         )
+
+    def test_get_not_existing_sku(self):
+        response = self.client.get(url_for('api.get_sku',
+                                           stock_code='dunno really'))
+        self.assertEqual(response.status_code, 404)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['error'], 'not found')
 
     def test_post_offer(self):
         # create new product
@@ -414,3 +427,9 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(json_response['priority'], 1000)
         self.assertEqual(json_response['product_price'], 100.00)
         self.assertEqual(json_response['category'], 'New Category')
+
+    def test_not_existing_offer(self):
+        response = self.client.get(url_for('api.get_offer', pk=100))
+        self.assertEqual(response.status_code, 404)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['error'], 'not found')

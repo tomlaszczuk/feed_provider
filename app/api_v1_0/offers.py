@@ -1,4 +1,4 @@
-from flask import jsonify, request, url_for
+from flask import jsonify, request, url_for, abort
 from . import api
 from .. import db
 from ..models import Offer, SKU
@@ -7,7 +7,7 @@ from ..exceptions import ValidationError
 
 @api.route('/offer/<int:pk>/', methods=['GET'])
 def get_offer(pk):
-    offer = Offer.query.get(pk)
+    offer = Offer.query.get_or_404(pk)
     return jsonify(offer.to_json())
 
 
@@ -17,9 +17,11 @@ def get_offers():
     return jsonify({'offers': [offer.to_json() for offer in offers]})
 
 
-@api.route('/sku/<stock_code>/offers', methods=['GET'])
+@api.route('/sku/<stock_code>/offers/', methods=['GET'])
 def get_offers_for_sku(stock_code):
     sku = SKU.query.filter_by(stock_code=stock_code).first()
+    if not sku:
+        abort(404)
     offers = Offer.query.filter_by(sku=sku).order_by(Offer.id)
     return jsonify({'offers': [offer.to_json() for offer in offers]})
 
@@ -49,7 +51,7 @@ def post_offer(stock_code):
 
 @api.route('/offer/<int:pk>/', methods=['PUT'])
 def edit_offer(pk):
-    offer = Offer.query.get(pk)
+    offer = Offer.query.get_or_404(pk)
     req_json = request.get_json(force=True)
     offer.category = req_json.get('category', offer.category)
     offer.priority = req_json.get('priority', offer.priority)

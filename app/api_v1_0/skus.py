@@ -1,4 +1,4 @@
-from flask import jsonify, request, url_for
+from flask import jsonify, request, url_for, abort
 from . import api
 from .. import db
 from ..models import SKU, Product, Photo
@@ -7,6 +7,8 @@ from ..models import SKU, Product, Photo
 @api.route('/sku/<stock_code>/', methods=['GET'])
 def get_sku(stock_code):
     sku = SKU.query.filter_by(stock_code=stock_code).first()
+    if not sku:
+        abort(404)
     return jsonify(sku.to_json())
 
 
@@ -18,7 +20,7 @@ def get_skus():
 
 @api.route('/product/<int:pk>/skus/', methods=['GET'])
 def get_skus_for_product(pk):
-    product = Product.query.get(pk)
+    product = Product.query.get_or_404(pk)
     skus = SKU.query.filter_by(base_product=product).order_by(SKU.id)
     return jsonify({'skus': [sku.to_json() for sku in skus]})
 
