@@ -230,6 +230,56 @@ class ApiTestCase(unittest.TestCase):
                          url_for('api.get_sku', stock_code=stock_code,
                                  _external=True))
 
+    def test_edit_sku(self):
+        # create new product
+        p = Product(manufacturer='LG', model_name='G2 Mini',
+                    product_type='PHONE')
+        db.session.add(p)
+        db.session.commit()
+
+        # create new sku for that product
+        stock_code = 'lg-g2-mini-lte-black'
+        response = self.client.post(
+            url_for('api.post_sku', pk=p.id),
+            data=json.dumps({
+                'stock_code': stock_code,
+                'availability': 'AVAILABLE',
+                'photos': [
+                    {'default': True, 'url': 'http://some.photo.com'},
+                    {'default': False, 'url': 'http://another.photo.com'}
+                ]
+            })
+        )
+        self.assertEqual(response.status_code, 201)
+        url = response.headers.get('Location')
+
+        # edit availability info and photos
+        response = self.client.put(
+            url_for('api.edit_sku', stock_code=stock_code),
+            data=json.dumps({
+                'availability': 'NOT_AVAILABLE',
+                'photos': [
+                    {'default': True, 'url': 'http://main.photo.com'},
+                    {'default': False, 'url': 'http://exclusive.photo.com'}
+                ]
+            })
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # get newly created and edited sku
+        self.client.get(url)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['availability'], 'NOT_AVAILABLE')
+        self.assertEqual(len(json_response['photos']), 3)
+        self.assertIn(
+            {'default': True, 'url': 'http://main.photo.com'},
+            json_response['photos']
+        )
+        self.assertNotIn(
+            {'default': True, 'url': 'http://some.photo.com'},
+            json_response['photos']
+        )
+
     def test_post_offer(self):
         # create new product
         p = Product(manufacturer='LG', model_name='G2 Mini',

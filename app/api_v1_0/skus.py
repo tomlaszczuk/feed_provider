@@ -39,3 +39,21 @@ def post_sku(pk):
     return jsonify(sku.to_json()), 201, \
         {'Location': url_for('api.get_sku', stock_code=sku.stock_code,
                              _external=True)}
+
+
+@api.route('/sku/<stock_code>/', methods=['PUT'])
+def edit_sku(stock_code):
+    sku = SKU.query.filter_by(stock_code=stock_code).first()
+    req_json = request.get_json(force=True)
+    sku.availability = req_json.get('availability', sku.availability)
+    photos = req_json.get('photos')
+    for photo in photos:
+        if photo.get('default') is False and photo.get('url'):
+            p = Photo(default=False, url=photo['url'], sku=sku)
+            db.session.add(p)
+        elif photo.get('default') is True and photo.get('url'):
+            p = Photo.query.filter_by(sku=sku, default=True).first()
+            p.url = photo['url']
+            db.session.add(p)
+    db.session.commit()
+    return jsonify(sku.to_json()), 200
