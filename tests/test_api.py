@@ -433,3 +433,12 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertEqual(json_response['error'], 'not found')
+
+    def test_offers_collection_is_paginated(self):
+        response = self.client.get(url_for('api.get_offers'))
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertIn('meta', json_response)
+        self.assertIn('page', json_response['meta'])
+        self.assertIn('total_pages', json_response['meta'])
+        self.assertIn('previous', json_response['meta'])
+        self.assertIn('next', json_response['meta'])

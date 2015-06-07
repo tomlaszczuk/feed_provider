@@ -13,8 +13,33 @@ def get_offer(pk):
 
 @api.route('/offers/', methods=['GET'])
 def get_offers():
-    offers = Offer.query.order_by(Offer.id)
-    return jsonify({'offers': [offer.to_json() for offer in offers]})
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    offers = Offer.query.paginate(page, per_page)
+    meta = {
+        'page': page,
+        'total_pages': offers.pages,
+        'per_page': per_page,
+        'total_items': offers.total
+    }
+    if offers.has_prev:
+        meta['previous'] = url_for(request.endpoint,
+                                   page=offers.prev_num, _external=True)
+    else:
+        meta['previous'] = None
+    if offers.has_next:
+        meta['next'] = url_for(request.endpoint,
+                               page=offers.next_num, _external=True)
+    else:
+        meta['next'] = None
+    meta['first'] = url_for(request.endpoint, page=1, _external=True)
+    meta['last'] = url_for(request.endpoint, page=offers.pages, _external=True)
+    return jsonify(
+        {
+            'offers': [offer.to_json() for offer in offers.items],
+            'meta': meta
+        }
+    )
 
 
 @api.route('/sku/<stock_code>/offers/', methods=['GET'])
