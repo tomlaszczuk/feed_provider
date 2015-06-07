@@ -2,6 +2,7 @@ from flask import jsonify, request, url_for
 from . import api
 from .. import db
 from ..models import Offer, SKU
+from ..exceptions import ValidationError
 
 
 @api.route('/offer/<int:pk>/', methods=['GET'])
@@ -44,3 +45,16 @@ def post_offer(stock_code):
     return jsonify(offer.to_json()), 201, \
         {'Location': url_for('api.get_offer', pk=offer.id,
                              _external=True)}
+
+
+@api.route('/offer/<int:pk>/', methods=['PUT'])
+def edit_offer(pk):
+    offer = Offer.query.get(pk)
+    req_json = request.get_json(force=True)
+    offer.category = req_json.get('category', offer.category)
+    offer.priority = req_json.get('priority', offer.priority)
+    if req_json.get('product_price'):
+        offer.set_prices(req_json['product_price'])
+    db.session.add(offer)
+    db.session.commit()
+    return jsonify(offer.to_json()), 200

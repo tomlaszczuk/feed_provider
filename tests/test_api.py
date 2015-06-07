@@ -372,3 +372,45 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertEqual(len(json_response['offers']), 2)
+
+    def test_edit_offer(self):
+        # create new product
+        p = Product(manufacturer='LG', model_name='G2 Mini',
+                    product_type='PHONE')
+        # create new sku for that product
+        sku = SKU(stock_code='lg-g2-mini-black', base_product=p)
+        db.session.add_all([p, sku])
+        db.session.commit()
+
+        # post new offer
+        response = self.client.post(
+            url_for('api.post_offer', stock_code=sku.stock_code),
+            data=json.dumps({
+                'segmentation': 'IND.NEW.POSTPAID.ACQ',
+                'tariff_plan_code': '14L60',
+                'offer_nsi_code': 'XLINS24A',
+                'contract_condition': '24A',
+                'monthly_price': 100.00,
+                'product_price': 90.00
+            })
+        )
+        self.assertEqual(response.status_code, 201)
+        url = response.headers.get('Location')
+
+        # edit newly created offer
+        response = self.client.put(
+            url,
+            data=json.dumps({
+                'priority': 1000,
+                'product_price': 100.00,
+                'category': 'New Category'
+            })
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # get newly added and edited offer
+        response = self.client.get(url)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(json_response['priority'], 1000)
+        self.assertEqual(json_response['product_price'], 100.00)
+        self.assertEqual(json_response['category'], 'New Category')

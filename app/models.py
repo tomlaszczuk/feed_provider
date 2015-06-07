@@ -199,6 +199,7 @@ class Offer(db.Model):
             'segmentation': self.segmentation,
             'market': self.market,
             'product_price': self.price,
+            'priority': self.priority,
             'monthly_price': self.abo_price,
             'offer_nsi_code': self.offer_code,
             'tariff_plan_code': self.tariff_plan_code,
